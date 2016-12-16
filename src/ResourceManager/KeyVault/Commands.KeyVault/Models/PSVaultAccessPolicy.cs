@@ -21,7 +21,7 @@ namespace Microsoft.Azure.Commands.KeyVault.Models
 {
     public class PSVaultAccessPolicy
     {
-        public PSVaultAccessPolicy(Guid tenantId, Guid objectId, Guid?  applicationId, string[] permissionsToKeys, string[] permissionsToSecrets)
+        public PSVaultAccessPolicy(Guid tenantId, string objectId, Guid? applicationId, string[] permissionsToKeys, string[] permissionsToSecrets)
         {
             TenantId = tenantId;
             ObjectId = objectId;
@@ -29,22 +29,23 @@ namespace Microsoft.Azure.Commands.KeyVault.Models
             PermissionsToSecrets = permissionsToSecrets == null ? new List<string>() : new List<string>(permissionsToSecrets);
             PermissionsToKeys = permissionsToKeys == null ? new List<string>() : new List<string>(permissionsToKeys);
         }
-        public PSVaultAccessPolicy(KeyVaultManagement.AccessPolicyEntry s, ActiveDirectoryClient adClient)
-        {            
+
+        public PSVaultAccessPolicy(KeyVaultManagement.Models.AccessPolicyEntry s, ActiveDirectoryClient adClient)
+        {
             ObjectId = s.ObjectId;
             DisplayName = ModelExtensions.GetDisplayNameForADObject(s.ObjectId, adClient);
             ApplicationId = s.ApplicationId;
             TenantId = s.TenantId;
             TenantName = s.TenantId.ToString();
-            PermissionsToSecrets = new List<string>(s.PermissionsToSecrets);
-            PermissionsToKeys = new List<string>(s.PermissionsToKeys);
+            PermissionsToSecrets = s.Permissions.Secrets == null ? new List<string>() : new List<string>(s.Permissions.Secrets);
+            PermissionsToKeys = s.Permissions.Keys == null ? new List<string>() : new List<string>(s.Permissions.Keys);
         }
 
         public Guid TenantId { get; private set; }
 
         public string TenantName { get; private set; }
 
-        public Guid ObjectId { get; private set; }
+        public string ObjectId { get; private set; }
 
         public Guid? ApplicationId { get; private set; }
         public string DisplayName { get; private set; }
